@@ -1,5 +1,9 @@
 let originalSkinBase64 = null;
+let currentSkinBase64 = null;
+let modelType = "default"; // "default" = Steve, "slim" = Alex
+
 console.log("THIS IS THE CORRECT MAIN.JS");
+
 import { SkinViewer } from "skinview3d";
 
 // Create the SkinViewer instance
@@ -7,15 +11,38 @@ const viewer = new SkinViewer({
     canvas: document.getElementById("skinViewer"),
     width: 400,
     height: 600,
-    skin: "./steve.png", // Default skin
 });
 
+// Enable controls
 viewer.controls.enableZoom = true;
 viewer.controls.enableRotate = true;
 
-let currentSkinBase64 = null; // Store the current skin in base64 format
+// Detect whether a skin is Steve or Alex
+function detectModelType(base64) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
 
-// Function to overlay the selected clothing onto the skin
+            // Pixel (54, 20) determines model type
+            const pixel = ctx.getImageData(54, 20, 1, 1).data;
+
+            // Transparent pixel → Alex
+            if (pixel[3] === 0) {
+                resolve("slim");
+            } else {
+                resolve("default");
+            }
+        };
+        img.src = base64;
+    });
+}
+
+// Overlay clothing onto the ORIGINAL skin (never the modified one)
 const overlayClothing = (clothingPath) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -28,46 +55,39 @@ const overlayClothing = (clothingPath) => {
 
     return new Promise((resolve) => {
         skinImage.onload = () => {
-            // Draw the full base skin
+            // Draw the base skin
             ctx.drawImage(skinImage, 0, 0, 64, 64);
 
             clothingImage.onload = () => {
-                // Draw clothing overlay
                 ctx.drawImage(clothingImage, 0, 0, 64, 64);
 
-                // Convert to base64
                 const modifiedSkinBase64 = canvas.toDataURL("image/png");
                 resolve(modifiedSkinBase64);
             };
 
             clothingImage.onerror = () => {
                 console.error("Clothing failed to load:", clothingPath);
-                resolve(currentSkinBase64 || "/SolanduWardrobe/textures/steve.png");
+                resolve(originalSkinBase64 || "/SolanduWardrobe/textures/steve.png");
             };
 
-            // Cache-busting query param ensures reload every time
+            // Cache-busting to force reload
             clothingImage.src = `${clothingPath}?v=${Date.now()}`;
         };
 
-        // Always reset to original base skin, not the modified one
-        skinImage.src = currentSkinBase64 || "/SolanduWardrobe/textures/steve.png";
+        // Always use ORIGINAL skin, not modified
+        skinImage.src = originalSkinBase64 || "/SolanduWardrobe/textures/steve.png";
     });
 };
 
-
-// Function to update the 3D viewer with selected clothing
+// Update viewer with selected clothing
 const updateSkin = async () => {
     const clothingPath = `/SolanduWardrobe/textures/${document.getElementById("clothingSelect").value}.png`;
 
-
     try {
-        // Apply the selected clothing overlay
         const modifiedSkin = await overlayClothing(clothingPath);
 
-        // Load the modified skin into the viewer
-        viewer.loadSkin(modifiedSkin);
+        viewer.loadSkin(modifiedSkin, { model: modelType });
 
-        // Enable the download button
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
         downloadButton.onclick = () => {
@@ -82,20 +102,26 @@ const updateSkin = async () => {
     }
 };
 
-// Event listener for file upload
-document.getElementById("upload").addEventListener("change", (e) => {
+// Handle file upload
+document.getElementById("upload").addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             currentSkinBase64 = event.target.result;
+            originalSkinBase64 = currentSkinBase64;
+
+            modelType = await detectModelType(currentSkinBase64);
+
+            viewer.loadSkin(currentSkinBase64, { model: modelType });
+
             updateSkin();
         };
         reader.readAsDataURL(file);
     }
 });
 
-// Event listener for username search
+// Handle username search
 document.getElementById("searchButton").addEventListener("click", async () => {
     const username = document.getElementById("username").value;
     if (username) {
@@ -108,14 +134,19 @@ document.getElementById("searchButton").addEventListener("click", async () => {
             const data = await response.json();
             const uuid = data.uuid;
 
-            // Use Crafatar to get the skin
             const skinUrl = `https://crafatar.com/skins/${uuid}`;
             const skinResponse = await fetch(skinUrl);
             const blob = await skinResponse.blob();
 
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
                 currentSkinBase64 = event.target.result;
+                originalSkinBase64 = currentSkinBase64;
+
+                modelType = await detectModelType(currentSkinBase64);
+
+                viewer.loadSkin(currentSkinBase64, { model: modelType });
+
                 updateSkin();
             };
             reader.readAsDataURL(blob);
@@ -125,6 +156,8 @@ document.getElementById("searchButton").addEventListener("click", async () => {
     }
 });
 
-// Event listener for clothing selection
+// Clothing selection
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
-viewer.loadSkin("/SolanduWardrobe/textures/steve.png");
+
+// Load Steve on startup
+viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
