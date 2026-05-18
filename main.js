@@ -1,3 +1,4 @@
+console.log("THIS IS THE CORRECT MAIN.JS");
 import { SkinViewer } from "skinview3d";
 
 // Create the SkinViewer instance
