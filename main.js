@@ -82,7 +82,11 @@ const overlayClothing = (clothingPath) => {
 
 // Update viewer with selected clothing
 const updateSkin = async () => {
-    const clothingPath = `/SolanduWardrobe/textures/${document.getElementById("clothingSelect").value}.png`;
+    const select = document.getElementById("clothingSelect");
+const value = select.value;
+const clothingPath = `/SolanduWardrobe/textures/${value}.png`;
+console.log("Selected value:", value);
+console.log("Clothing path:", clothingPath);
 
     try {
         const modifiedSkin = await overlayClothing(clothingPath);
