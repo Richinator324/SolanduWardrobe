@@ -30,26 +30,29 @@ const overlayClothing = (clothingPath) => {
             // Draw the full base skin
             ctx.drawImage(skinImage, 0, 0, 64, 64);
 
-
             clothingImage.onload = () => {
-                // Overlay the selected clothing texture
+                // Draw clothing overlay
                 ctx.drawImage(clothingImage, 0, 0, 64, 64);
 
-                // Convert the modified skin back to base64
+                // Convert to base64
                 const modifiedSkinBase64 = canvas.toDataURL("image/png");
                 resolve(modifiedSkinBase64);
             };
+
             clothingImage.onerror = () => {
                 console.error("Clothing failed to load:", clothingPath);
-                resolve(currentSkinBase64 || "./steve.png");
+                resolve(currentSkinBase64 || "/SolanduWardrobe/textures/steve.png");
             };
-            clothingImage.src = clothingPath;
+
+            // Cache-busting query param ensures reload every time
+            clothingImage.src = `${clothingPath}?v=${Date.now()}`;
         };
 
+        // Always reset to original base skin, not the modified one
         skinImage.src = currentSkinBase64 || "/SolanduWardrobe/textures/steve.png";
-
     });
 };
+
 
 // Function to update the 3D viewer with selected clothing
 const updateSkin = async () => {
