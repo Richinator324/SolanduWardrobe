@@ -39,7 +39,10 @@ const overlayClothing = (clothingPath) => {
                 const modifiedSkinBase64 = canvas.toDataURL("image/png");
                 resolve(modifiedSkinBase64);
             };
-
+            clothingImage.onerror = () => {
+                console.error("Clothing failed to load:", clothingPath);
+                resolve(currentSkinBase64 || "./steve.png");
+            };
             clothingImage.src = clothingPath;
         };
 
@@ -50,7 +53,8 @@ const overlayClothing = (clothingPath) => {
 
 // Function to update the 3D viewer with selected clothing
 const updateSkin = async () => {
-    const clothingPath = `/${document.getElementById("clothingSelect").value}.png`;
+    const clothingPath = `/SolandWardrobe/textures/${document.getElementById("clothingSelect").value}.png`;
+
 
     try {
         // Apply the selected clothing overlay
