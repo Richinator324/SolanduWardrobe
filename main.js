@@ -46,7 +46,7 @@ const overlayClothing = (clothingPath) => {
             clothingImage.src = clothingPath;
         };
 
-        skinImage.src = currentSkinBase64 || "./steve.png";
+        skinImage.src = currentSkinBase64 || "/SolanduWardrobe/textures/steve.png";
 
     });
 };
