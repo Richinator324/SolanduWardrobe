@@ -1,3 +1,4 @@
+let originalSkinBase64 = null;
 console.log("THIS IS THE CORRECT MAIN.JS");
 import { SkinViewer } from "skinview3d";
 
@@ -126,3 +127,4 @@ document.getElementById("searchButton").addEventListener("click", async () => {
 
 // Event listener for clothing selection
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
+viewer.loadSkin("/SolanduWardrobe/textures/steve.png");
