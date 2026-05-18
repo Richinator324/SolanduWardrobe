@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solandu Wardrobe</title>
+  <script type="module" crossorigin src="/SolanduWardrobe/assets/index-Db-VrsKE.js"></script>
+  <link rel="stylesheet" crossorigin href="/SolanduWardrobe/assets/index-BjlPLkmi.css">
+</head>
+<body>
+    <header>
+        <img src="/SolanduWardrobe/assets/sunwarriors-D1pzCjMp.png" alt="Sun Warrior Logo" />
+        <h1>Solandu Wardrobe</h1>
+        <img src="/SolanduWardrobe/assets/sunwarriors-D1pzCjMp.png" alt="Sun Warrior Logo" />
+    </header>
+    <div id="container">
+        <div id="controls">
+            <h1>Upload</h1>
+            <input type="file" id="upload" accept=".png" />
+            
+            <!-- Custom-styled dropdown for clothing -->
+            <label for="clothingSelect">Choose Outfit:</label>
+            <div class="custom-select">
+                <select id="clothingSelect">
+                    <option value="hari">Hari</option>
+                    <option value="sahui">Sahui</option>
+                </select>
+            </div>
+
+            <button id="downloadButton" style="display: none;">Download Skin</button>
+        </div>
+        <div id="viewer">
+            <canvas id="skinViewer"></canvas>
+        </div>
+    </div>
+</body>
+</html>
