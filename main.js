@@ -161,4 +161,6 @@ document.getElementById("searchButton").addEventListener("click", async () => {
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
 
 // Load Steve on startup
+originalSkinBase64 = "/SolandWardrobe/textures/steve.png";
+currentSkinBase64 = originalSkinBase64;
 viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
