@@ -11,6 +11,7 @@ const viewer = new SkinViewer({
     canvas: document.getElementById("skinViewer"),
     width: 400,
     height: 600,
+    skin: "/SolanduWardrobe/textures/steve.png",
 });
 
 // Enable controls
