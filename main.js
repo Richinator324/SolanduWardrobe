@@ -27,8 +27,9 @@ const overlayClothing = (clothingPath) => {
 
     return new Promise((resolve) => {
         skinImage.onload = () => {
-            // Draw the base skin
-            ctx.drawImage(skinImage, 0, 0, 64, 16, 0, 0, 64, 16);
+            // Draw the full base skin
+            ctx.drawImage(skinImage, 0, 0, 64, 64);
+
 
             clothingImage.onload = () => {
                 // Overlay the selected clothing texture
