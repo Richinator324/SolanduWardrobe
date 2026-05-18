@@ -40,7 +40,7 @@ const overlayClothing = (clothingPath) => {
                 resolve(modifiedSkinBase64);
             };
 
-            clothingImage.src = clothingPath;
+            clothingImage.src = `${clothingPath}?v=${Date.now()}`;
         };
 
         skinImage.src = currentSkinBase64;
