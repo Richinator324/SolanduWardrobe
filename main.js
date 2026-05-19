@@ -83,20 +83,17 @@ const overlayClothing = (clothingPath) => {
 // Update viewer with selected clothing
 const updateSkin = async () => {
     const select = document.getElementById("clothingSelect");
-const value = select.value;
-const clothingPath = `/SolanduWardrobe/textures/${value}.png`;
-console.log("Selected value:", value);
-console.log("Clothing path:", clothingPath);
+    const value = select.value;
+    const clothingPath = `/SolanduWardrobe/textures/${value}.png`;
+
+    console.log("Selected value:", value);
+    console.log("Clothing path:", clothingPath);
 
     try {
         const modifiedSkin = await overlayClothing(clothingPath);
 
         viewer.loadSkin(modifiedSkin, { model: modelType });
-        viewer.playerObject.skin.modelType = modelType;
-
-        originalSkinBase64 = modifiedSkin;
-        currentSkinBase64 = modifiedSkin;
-
+        viewer.playerObject.skin.modelType = modelType; // ⭐ FIX: force geometry update
 
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
@@ -124,8 +121,7 @@ document.getElementById("upload").addEventListener("change", async (e) => {
             modelType = await detectModelType(currentSkinBase64);
 
             viewer.loadSkin(currentSkinBase64, { model: modelType });
-            viewer.playerObject.skin.modelType = modelType;
-
+            viewer.playerObject.skin.modelType = modelType; // ⭐ FIX: force geometry update
 
             updateSkin();
         };
@@ -139,6 +135,6 @@ document.getElementById("clothingSelect").addEventListener("change", updateSkin)
 // Load Steve on startup
 originalSkinBase64 = "/SolanduWardrobe/textures/steve.png";
 currentSkinBase64 = originalSkinBase64;
-viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
-viewer.playerObject.skin.modelType = "default";
 
+viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
+viewer.playerObject.skin.modelType = "default"; // ⭐ FIX: force geometry update
