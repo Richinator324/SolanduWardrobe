@@ -101,7 +101,7 @@ const updateSkin = async () => {
         // ⭐ Clothing-based model override
         const clothingModel = clothingModelMap[value] || modelType;
 
-        viewer.loadSkin(modifiedSkin, { model: clothingModel });
+        viewer.loadSkin(modifiedSkin, { model: modelType });
 
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
@@ -126,16 +126,20 @@ document.getElementById("upload").addEventListener("change", async (e) => {
             currentSkinBase64 = event.target.result;
             originalSkinBase64 = currentSkinBase64;
 
+            // Detect model from the REAL skin
             modelType = await detectModelType(currentSkinBase64);
+            console.log("Detected model:", modelType);
 
+            // Load the REAL skin with the correct model
             viewer.loadSkin(currentSkinBase64, { model: modelType });
-            viewer.playerObject.skin.modelType = modelType; // ⭐ FIX: force geometry update
 
+            // Apply clothing on top
             updateSkin();
         };
         reader.readAsDataURL(file);
     }
 });
+
 
 // Clothing selection
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
