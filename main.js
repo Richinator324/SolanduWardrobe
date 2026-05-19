@@ -90,10 +90,15 @@ const updateSkin = async () => {
     console.log("Clothing path:", clothingPath);
 
     try {
+        // ⭐ Always overlay on the CLEAN base skin
         const modifiedSkin = await overlayClothing(clothingPath);
 
+        // ⭐ Load the new skin (modelType stays whatever was detected on upload)
         viewer.loadSkin(modifiedSkin, { model: modelType });
-        viewer.playerObject.skin.modelType = modelType; // ⭐ FIX: force geometry update
+
+        // ❌ DO NOT update originalSkinBase64 here
+        // ❌ DO NOT update currentSkinBase64 here
+        // These caused stacking (Hari pixels staying on Sahui)
 
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
@@ -108,6 +113,7 @@ const updateSkin = async () => {
         alert("Failed to load or apply the selected clothing.");
     }
 };
+
 
 // Handle file upload
 document.getElementById("upload").addEventListener("change", async (e) => {
