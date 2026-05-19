@@ -92,9 +92,11 @@ console.log("Clothing path:", clothingPath);
         const modifiedSkin = await overlayClothing(clothingPath);
 
         viewer.loadSkin(modifiedSkin, { model: modelType });
+        viewer.playerObject.skin.modelType = modelType;
 
         originalSkinBase64 = modifiedSkin;
         currentSkinBase64 = modifiedSkin;
+
 
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
@@ -122,6 +124,8 @@ document.getElementById("upload").addEventListener("change", async (e) => {
             modelType = await detectModelType(currentSkinBase64);
 
             viewer.loadSkin(currentSkinBase64, { model: modelType });
+            viewer.playerObject.skin.modelType = modelType;
+
 
             updateSkin();
         };
@@ -136,3 +140,5 @@ document.getElementById("clothingSelect").addEventListener("change", updateSkin)
 originalSkinBase64 = "/SolanduWardrobe/textures/steve.png";
 currentSkinBase64 = originalSkinBase64;
 viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
+viewer.playerObject.skin.modelType = "default";
+
