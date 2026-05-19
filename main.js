@@ -126,41 +126,6 @@ document.getElementById("upload").addEventListener("change", async (e) => {
     }
 });
 
-// Handle username search
-document.getElementById("searchButton").addEventListener("click", async () => {
-    const username = document.getElementById("username").value;
-    if (username) {
-        try {
-            const response = await fetch(`https://api.ashcon.app/mojang/v2/user/${username}`);
-            if (!response.ok) {
-                alert("Username not found!");
-                return;
-            }
-            const data = await response.json();
-            const uuid = data.uuid;
-
-            const skinUrl = `https://crafatar.com/skins/${uuid}`;
-            const skinResponse = await fetch(skinUrl);
-            const blob = await skinResponse.blob();
-
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                currentSkinBase64 = event.target.result;
-                originalSkinBase64 = currentSkinBase64;
-
-                modelType = await detectModelType(currentSkinBase64);
-
-                viewer.loadSkin(currentSkinBase64, { model: modelType });
-
-                updateSkin();
-            };
-            reader.readAsDataURL(blob);
-        } catch (error) {
-            alert("An error occurred while fetching the skin.");
-        }
-    }
-});
-
 // Clothing selection
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
 
