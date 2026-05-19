@@ -11,7 +11,7 @@ let modelType = "default"; // "default" = Steve, "slim" = Alex
 
 console.log("THIS IS THE CORRECT MAIN.JS");
 
-import { SkinViewer } from "skinview3d/dist/skinview3d.es.js";
+import { SkinViewer } from "./skinview3d/dist/skinview3d.es.js";
 
 // We MUST use let so we can recreate the viewer
 let viewer = new SkinViewer({
