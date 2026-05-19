@@ -93,6 +93,9 @@ console.log("Clothing path:", clothingPath);
 
         viewer.loadSkin(modifiedSkin, { model: modelType });
 
+        originalSkinBase64 = modifiedSkin;
+        currentSkinBase64 = modifiedSkin;
+
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
         downloadButton.onclick = () => {
@@ -130,6 +133,6 @@ document.getElementById("upload").addEventListener("change", async (e) => {
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
 
 // Load Steve on startup
-originalSkinBase64 = "/SolandWardrobe/textures/steve.png";
+originalSkinBase64 = "/SolanduWardrobe/textures/steve.png";
 currentSkinBase64 = originalSkinBase64;
 viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
