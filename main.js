@@ -1,7 +1,7 @@
 // Clothing → model type mapping
 const clothingModelMap = {
-    "hari": "slim",
-    "sahui": "default"
+    "hari": "default",
+    "sahui": "slim"
 };
 
 let originalSkinBase64 = null;
