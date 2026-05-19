@@ -1,4 +1,5 @@
 // Clothing → model type mapping
+// Hari = Steve (default), Sahui = Alex (slim)
 const clothingModelMap = {
     "hari": "default",
     "sahui": "slim"
@@ -12,17 +13,37 @@ console.log("THIS IS THE CORRECT MAIN.JS");
 
 import { SkinViewer } from "skinview3d";
 
-// Create the SkinViewer instance
-const viewer = new SkinViewer({
+// We MUST use let so we can recreate the viewer
+let viewer = new SkinViewer({
     canvas: document.getElementById("skinViewer"),
     width: 400,
     height: 600,
     skin: "/SolanduWardrobe/textures/steve.png",
+    model: "default"
 });
 
-// Enable controls
 viewer.controls.enableZoom = true;
 viewer.controls.enableRotate = true;
+
+// Helper to recreate viewer so model changes actually apply
+const recreateViewer = (skin, model) => {
+    const canvas = document.getElementById("skinViewer");
+
+    if (viewer && typeof viewer.dispose === "function") {
+        viewer.dispose();
+    }
+
+    viewer = new SkinViewer({
+        canvas,
+        width: 400,
+        height: 600,
+        skin,
+        model
+    });
+
+    viewer.controls.enableZoom = true;
+    viewer.controls.enableRotate = true;
+};
 
 // Detect whether a skin is Steve or Alex
 function detectModelType(base64) {
@@ -35,10 +56,8 @@ function detectModelType(base64) {
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
 
-            // Pixel (54, 20) determines model type
             const pixel = ctx.getImageData(54, 20, 1, 1).data;
 
-            // Transparent pixel → Alex
             if (pixel[3] === 0) {
                 resolve("slim");
             } else {
@@ -49,7 +68,7 @@ function detectModelType(base64) {
     });
 }
 
-// Overlay clothing onto the ORIGINAL skin (never the modified one)
+// Overlay clothing onto the ORIGINAL skin
 const overlayClothing = (clothingPath) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -62,27 +81,22 @@ const overlayClothing = (clothingPath) => {
 
     return new Promise((resolve) => {
         skinImage.onload = () => {
-            // Draw the base skin
             ctx.drawImage(skinImage, 0, 0, 64, 64);
 
             clothingImage.onload = () => {
                 ctx.drawImage(clothingImage, 0, 0, 64, 64);
-
-                const modifiedSkinBase64 = canvas.toDataURL("image/png");
-                resolve(modifiedSkinBase64);
+                resolve(canvas.toDataURL("image/png"));
             };
 
             clothingImage.onerror = () => {
                 console.error("Clothing failed to load:", clothingPath);
-                resolve(originalSkinBase64 || "/SolanduWardrobe/textures/steve.png");
+                resolve(originalSkinBase64);
             };
 
-            // Cache-busting to force reload
             clothingImage.src = `${clothingPath}?v=${Date.now()}`;
         };
 
-        // Always use ORIGINAL skin, not modified
-        skinImage.src = originalSkinBase64 || "/SolanduWardrobe/textures/steve.png";
+        skinImage.src = originalSkinBase64;
     });
 };
 
@@ -98,10 +112,11 @@ const updateSkin = async () => {
     try {
         const modifiedSkin = await overlayClothing(clothingPath);
 
-        // ⭐ Clothing-based model override
+        // Clothing determines model
         const clothingModel = clothingModelMap[value] || modelType;
 
-        viewer.loadSkin(modifiedSkin, { model: modelType });
+        // Recreate viewer so geometry actually changes
+        recreateViewer(modifiedSkin, clothingModel);
 
         const downloadButton = document.getElementById("downloadButton");
         downloadButton.style.display = "block";
@@ -126,20 +141,16 @@ document.getElementById("upload").addEventListener("change", async (e) => {
             currentSkinBase64 = event.target.result;
             originalSkinBase64 = currentSkinBase64;
 
-            // Detect model from the REAL skin
             modelType = await detectModelType(currentSkinBase64);
             console.log("Detected model:", modelType);
 
-            // Load the REAL skin with the correct model
-            viewer.loadSkin(currentSkinBase64, { model: modelType });
+            recreateViewer(currentSkinBase64, modelType);
 
-            // Apply clothing on top
             updateSkin();
         };
         reader.readAsDataURL(file);
     }
 });
-
 
 // Clothing selection
 document.getElementById("clothingSelect").addEventListener("change", updateSkin);
@@ -148,5 +159,4 @@ document.getElementById("clothingSelect").addEventListener("change", updateSkin)
 originalSkinBase64 = "/SolanduWardrobe/textures/steve.png";
 currentSkinBase64 = originalSkinBase64;
 
-viewer.loadSkin("/SolanduWardrobe/textures/steve.png", { model: "default" });
-viewer.playerObject.skin.modelType = "default"; // ⭐ FIX: force geometry update
+recreateViewer("/SolanduWardrobe/textures/steve.png", "default");
